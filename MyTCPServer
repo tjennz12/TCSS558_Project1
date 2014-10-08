@@ -1,0 +1,50 @@
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
+/**
+ * Server program simply echoes its input from a client back
+ * to that client.
+ * @author Trevor Jennings
+ */
+public class MyTCPServer {
+	
+	public static void main(String[] args) throws IOException {
+		
+		// Input port number from command line
+		int port = Integer.parseInt(args[0]);
+		
+		// Initialize variables
+		ServerSocket serverSock = null;
+		PrintWriter out = null;
+		BufferedReader in = null;
+		
+		// As the code runs, I'm printing descriptive messages to the
+		// console. See the messages to understand what the code is doing.
+		try {
+			serverSock = new ServerSocket(port);
+			System.out.println("Server socket connected!");
+			Socket clientSock = serverSock.accept();
+			System.out.println("Server socket accepts clinet socket!");
+			out = new PrintWriter(clientSock.getOutputStream(), true);
+		    in = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
+			String inputFromClient;
+			System.out.println("server data streams good, entering while loop...");
+			while ((inputFromClient = in.readLine()) != null) {
+				System.out.println("Server recieved from Client: " + inputFromClient);
+				out.println("ECHO: " + inputFromClient);
+			}
+		} catch (IOException ioe) {
+			System.err.println("Server connection error");
+		} finally {  // close all connections or "resources"
+			serverSock.close();
+			out.close();
+			in.close();
+		}
+		
+	}
+
+}
