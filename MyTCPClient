@@ -1,0 +1,53 @@
+import java.net.Socket;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.PrintWriter;
+
+/**
+ * Client program simply sends a message to a server and reads back
+ * the message from the server.
+ * @author Trevor Jennings
+ */
+public class MyTCPClient {
+	
+	public static void main(String[] args) throws IOException {
+		
+		// input server address to command line
+		String serverAddress = args[0];
+		// input port number to commmand line
+		int port = Integer.parseInt(args[1]);
+		
+		// Initialize all "resources"
+		BufferedReader in = null;
+		BufferedReader stdIn = null;
+		PrintWriter out = null;
+		Socket socket = null;
+		
+		// I'm printing out descriptive messages to the console. See
+		// the messages to understand what the code is doing.
+		try {
+		    socket = new Socket(serverAddress, port);
+		    System.out.println("Client is running!");
+		    out = new PrintWriter(socket.getOutputStream(), true);
+		    in = new BufferedReader(new InputStreamReader(
+				    socket.getInputStream()));
+		    stdIn = new BufferedReader(new InputStreamReader(System.in));
+		    String userInput;
+		    System.out.println("Data streams working, entering while loop...");
+		    while ((userInput = stdIn.readLine()) != null) {
+		    	System.out.println("waiting for echo from server...");
+		    	out.println(userInput);
+		    	System.out.println(in.readLine());
+		    }
+		} catch (IOException ioe) {
+			System.err.println("Client connection error");
+		} finally { // close all "resources"
+			socket.close();
+			in.close();
+			out.close();
+			stdIn.close();
+		}
+	}
+}
