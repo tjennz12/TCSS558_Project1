@@ -1,0 +1,43 @@
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.DatagramPacket;
+
+/**
+ * Simple echo program client sends a message (using UDP protocol),
+ * and recieves back the same message from the server which received
+ * the message.
+ * @author Trevor Jennings
+ */
+public class MyUDPClient {
+	
+	public static void main(String[] args) throws IOException {
+		
+		String hostname = args[0];
+		int port = Integer.parseInt(args[1]);
+		BufferedReader stdIn = new BufferedReader(
+				new InputStreamReader(System.in));
+		DatagramSocket socket = new DatagramSocket();
+		InetAddress IPAddress = InetAddress.getByName(hostname);
+		byte[] sendData = new byte[1024];
+		byte[] receiveData = new byte[1024];
+		String userInput = null;
+		
+		while ((userInput = stdIn.readLine()) != null) {
+			sendData = userInput.getBytes();
+			socket.send(new DatagramPacket(sendData, sendData.length, 
+					IPAddress, port));
+			DatagramPacket receivePacket = new DatagramPacket(receiveData,
+					receiveData.length);
+			socket.receive(receivePacket);
+			String inputFromServer = new String(receivePacket.getData());
+			System.out.println(inputFromServer);
+		}
+		
+		stdIn.close();
+		socket.close();
+	}
+
+}
