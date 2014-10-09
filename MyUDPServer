@@ -1,0 +1,51 @@
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+
+public class MyUDPServer {
+	
+	public static void main(String[] args) {
+		
+		if (args.length != 1) System.out.println("Usage: java MyUDPServer portNumber");
+		int port = Integer.parseInt(args[0]);
+		DatagramSocket serverSocket = null;
+		
+		try {
+		    serverSocket = new DatagramSocket(port);
+		    System.out.println("UDP Server running!");
+		    byte[] sendData = new byte[1024];
+		    byte[] receiveData = new byte[1024];
+		    while (true) {
+		    	
+		    	// Accept packet from client
+		    	DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+		    	serverSocket.receive(receivePacket);
+		    	
+		    	// collect info from packet sent by client
+		    	String clientInput = new String(receivePacket.getData());
+		    	InetAddress IPAddress = receivePacket.getAddress();
+		    	int portNum = receivePacket.getPort();
+		        
+		    	// Process client input
+		    	String capitalizedClientInput = clientInput.toUpperCase();
+		    	String capClientInputWithMessage = "From server: " + capitalizedClientInput;
+		    	
+		    	// Package processed input to be sent back to client
+		    	sendData = capClientInputWithMessage.getBytes();
+		    	DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, 
+		    			IPAddress, portNum);
+		    	
+		    	// return processed input back to client
+		    	serverSocket.send(sendPacket);    	
+		    }
+		} catch (SocketException se) {
+			System.err.println("Problem with server socket:" + se.getMessage());
+		} catch (IOException ioe) {
+			System.err.println("Problem with server socket recieving packet: " + ioe.getMessage());
+		} finally {
+			serverSocket.close();
+		}
+	}
+}
